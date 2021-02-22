@@ -12,12 +12,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ApiResource(
  *  normalizationContext={"groups"={"users_read"}}
  * )
  * @ApiFilter(SearchFilter::class, properties={"customers.firstName"})
+ * @UniqueEntity("email", message="Un utilisateur ayant cette adresse e-mail existe déjà")
  */
 class User implements UserInterface
 {
@@ -32,6 +36,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"customers_read","invoices_read", "users_read","invoices_subresource"})
+     * @Assert\NotBlank(message="L'e-mail doit être renseigné")
+     * @Assert\Email(message="L'e-mail doit être valide")
      */
     private $email;
 
@@ -44,12 +50,14 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="le mot de passe est obligatoire")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read","invoices_read", "users_read","invoices_subresource"})
+     * @Assert\NotBlank(message="Le prenom est obligatoire")
      */
     private $firstName;
 
